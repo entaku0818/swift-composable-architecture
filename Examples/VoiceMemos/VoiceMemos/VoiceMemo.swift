@@ -21,17 +21,23 @@ struct VoiceMemo {
     }
   }
 
-  enum Action {
+    public enum Action: Sendable, ViewAction {
+
     case audioPlayerClient(Result<Bool, Error>)
     case delegate(Delegate)
-    case playButtonTapped
     case timerUpdated(TimeInterval)
     case titleTextFieldChanged(String)
+    case view(View)
 
     @CasePathable
     enum Delegate {
       case playbackStarted
       case playbackFailed
+    }
+
+    @CasePathable
+    public enum View: Sendable {
+      case playButtonTapped
     }
   }
 
@@ -56,7 +62,7 @@ struct VoiceMemo {
       case .delegate:
         return .none
 
-      case .playButtonTapped:
+      case .view(.playButtonTapped):
         switch state.mode {
         case .notPlaying:
           state.mode = .playing(progress: 0)
@@ -100,6 +106,7 @@ struct VoiceMemo {
   }
 }
 
+@ViewAction(for: VoiceMemo.self)
 struct VoiceMemoView: View {
   @Bindable var store: StoreOf<VoiceMemo>
 
@@ -121,7 +128,7 @@ struct VoiceMemoView: View {
       }
 
       Button {
-        store.send(.playButtonTapped)
+        send(.playButtonTapped)
       } label: {
         Image(systemName: store.mode.is(\.playing) ? "stop.circle" : "play.circle")
           .font(.system(size: 22))
