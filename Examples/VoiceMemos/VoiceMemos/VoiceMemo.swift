@@ -21,7 +21,7 @@ struct VoiceMemo {
     }
   }
 
-    public enum Action: Sendable, ViewAction {
+  public enum Action: Sendable, ViewAction {
 
     case audioPlayerClient(Result<Bool, Error>)
     case delegate(Delegate)
